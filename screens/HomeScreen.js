@@ -6,17 +6,36 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Button,
   View,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 
+import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+
+import SettingsScreen from './SettingsScreen';
+
+const SettingsStack = createStackNavigator({
+  Settings: SettingsScreen,
+});
+
+SettingsStack.navigationOptions = {
+  tabBarLabel: 'Settings',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
+    />
+  ),
+};
+
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
-
+  
   render() {
     return (
       <View style={styles.container}>
@@ -40,7 +59,8 @@ export default class HomeScreen extends React.Component {
             <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
               <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
             </View>
-
+            <Button title="Settings" onPress={() => SettingsStack()}
+      />
             <Text style={styles.getStartedText}>
               Change this text and your app will automatically reload.
             </Text>
