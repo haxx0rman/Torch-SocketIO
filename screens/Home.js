@@ -4,6 +4,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  AsyncStorage,
   Text,
   TouchableOpacity,
   Button,
@@ -57,17 +58,87 @@ class HomeScreen extends React.Component {
       });
     }
 
+    state = {
+      names: [
+         {
+            id: 0,
+            name: 'Ben',
+         },
+         {
+            id: 1,
+            name: 'Susan',
+         },
+         // {
+         //    id: 2,
+         //    name: 'Robert',
+         // },
+         {
+            id: 3,
+            name: 'Mary',
+         }
+      ]
+   }
+   alertItemName = (item) => {
+      alert(item.name)
+   }
+
   render() {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={
+        { flex: 1,
+          //alignItems: 'center',
+          justifyContent: 'center',
+
+          flexDirection: 'column',
+          alignItems: 'stretch',
+        }}>
         <Text>Home Screen</Text>
-        <Button
-          title="Go to Details"
-          onPress={() => this.props.navigation.navigate('Details')}
-        />
+        <Button title="Go to Details" onPress={() => this.props.navigation.navigate('ConvoList')} />
+
+        <Button title="Show me more of the app" onPress={this._showMoreApp} />
+        <Button title="Actually, sign me out :)" onPress={this._signOutAsync} />
+        {
+               this.state.names.map((item, index) => (
+                 <View>
+                  <TouchableOpacity
+                     key = {item.id}
+                     style = {styles.container}
+                     onPress = {() => this.alertItemName(item)}>
+                     <Text style = {styles.text}>
+                        {item.name}
+                        {item.id}
+                     </Text>
+                  </TouchableOpacity>
+                  <View style={{ borderBottomColor: 'grey', borderBottomWidth: 1, }} />
+                  </View>
+
+               ))
+            }
       </View>
+
     );
   }
+  _showMoreApp = () => {
+    this.props.navigation.navigate('Other');
+  };
+
+  _signOutAsync = async () => {
+    await AsyncStorage.clear();
+    this.props.navigation.navigate('Auth');
+  };
 }
 
 export default HomeScreen;
+
+const styles = StyleSheet.create ({
+   container: {
+      padding: 10,
+      height: 50,
+      //marginTop: 1,
+      backgroundColor: 'skyblue',
+      alignItems: 'center',
+   },
+   text: {
+      color: '#4f603c'
+   }
+})
