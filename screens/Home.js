@@ -30,8 +30,8 @@ class HomeScreen extends React.Component {
   componentDidMount() {
 
       function SockIO(){
-        //this.socket = SocketIOClient('https://torch-messenger.herokuapp.com/', { transports: ['websocket'], jsonp: false });
-        this.socket = SocketIOClient('https://torch.pirho.site/', { transports: ['websocket'], jsonp: false });
+        this.socket = SocketIOClient('https://torch-messenger.herokuapp.com/', { transports: ['websocket'], jsonp: false });
+
 
         this.connect = function(){
           this.socket.connect();
@@ -71,6 +71,12 @@ class HomeScreen extends React.Component {
 
       sio.socket.on('oops', (data) => {
         console.log(data);
+        //socket.emit('ping');
+      });
+
+      sio.socket.on('echo', (data) => {
+        console.log("echo: ", data);
+        
         //socket.emit('ping');
       });
 
