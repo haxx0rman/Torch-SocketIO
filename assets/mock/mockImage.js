@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Image } from 'react-native';
-const initStyle = { borderRadius: 30, width: 60, height: 60 };
+const initStyle = { borderRadius: 1000, width: 60, height: 60 };
 const renderImages = (num, style = initStyle) => {
   switch (num) {
     case 1:

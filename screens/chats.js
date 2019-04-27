@@ -3,6 +3,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   AppRegistry,
   StyleSheet,
+  AsyncStorage,
   ScrollView,
   ListView,
   Image,
@@ -10,6 +11,8 @@ import {
   Text,
   View
 } from 'react-native';
+
+import SocketIOClient from 'socket.io-client'
 
 import renderImages from '../assets/mock/mockImage';
 
@@ -22,7 +25,53 @@ import { images, data } from '../assets/mock/mockChatList';
 // const images = R.range(1, 11).map(i => require(`../images/image${i}.jpeg`))
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
-export default class Chats extends Component {
+class HomeScreen extends React.Component {
+  componentDidMount() {
+
+      function SockIO(){
+        this.socket = SocketIOClient('http://robocock.herokuapp.com', { transports: ['websocket'], jsonp: false });
+
+        this.connect = function(){
+          this.socket.connect();
+        }
+
+        this.send = function(name, data = null){
+          if (data){
+            this.socket.emit(name, data);
+          } else {
+            this.socket.emit(name);
+          }
+        }
+      }
+
+      const sio = new SockIO();
+      global.sio = sio;
+      sio.connect()
+      //global.socket = socket;
+      sio.socket.on('connect', () => {
+        console.log('connected to socket server');
+        //socket.emit('ping');
+      });
+      sio.socket.on('ping', () => {
+        console.log('ping');
+        //console.log(this.props)
+        //socket.emit('ping');
+      });
+      sio.socket.on('no u', () => {
+        console.log('kys');
+        //socket.emit('ping');
+      });
+      sio.socket.on('gay', () => {
+        console.log('fuck u werre rite fuck');
+        //socket.emit('ping');
+      });
+      sio.socket.on('pong', (data) => {
+        console.log(data);
+        console.log('pong');
+      });
+    }
+
+
   constructor(props){
     super(props)
 
@@ -83,10 +132,40 @@ export default class Chats extends Component {
           dataSource={this.state.dataSource}
           renderRow={(rowData) => this.eachMessage(rowData)}
         />
+        <Button title="Actually, sign me out :)" onPress={this._signOutAsync} />
+        {
+               this.state.names.map((item, index) => (
+                 <View>
+                  <TouchableOpacity
+                     key = {item.id}
+                     style = {styles.container}
+                     onPress = {() => this.alertItemName(item)}>
+                     <Text style = {styles.text}>
+                        {item.name}
+                        {item.id}
+                     </Text>
+                  </TouchableOpacity>
+                  <View style={{ borderBottomColor: 'grey', borderBottomWidth: 1, }} />
+                  </View>
+
+               ))
+            }
       </View>
+
     );
   }
+  }
+  _showMoreApp = () => {
+    this.props.navigation.navigate('Other');
+  };
+
+  _signOutAsync = async () => {
+    await AsyncStorage.clear();
+    this.props.navigation.navigate('Auth');
+  };
 }
+
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

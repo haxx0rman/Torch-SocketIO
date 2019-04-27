@@ -11,11 +11,14 @@ class Example extends React.Component {
   }
 
   componentWillMount() {
+    const { navigation } = this.props;
+    const name = navigation.getParam('name', 'nemo')
     this.setState({
+      name: name,
       messages: [
         {
-          _id: 2,
-          text: 'Hey Daddy',
+          _id: "oneguy",
+          text: name,
           createdAt: new Date(),
           user: {
             _id: "RN",
@@ -24,7 +27,7 @@ class Example extends React.Component {
           },
         },
         {
-          _id: 1,
+          _id: "fagboi",
           text: 'Hey no u',
           createdAt: new Date(),
           user: {

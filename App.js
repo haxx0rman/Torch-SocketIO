@@ -10,7 +10,7 @@ import HomeScreen from "./screens/Home";
 import DetailsScreen from "./screens/Details";
 import ChatScreen from "./screens/IMUI";
 
-import ChatsScreen from "./screens/chats";
+//import ChatsScreen from "./screens/chats";
 
 
 const AppStack = createStackNavigator(
@@ -18,14 +18,18 @@ const AppStack = createStackNavigator(
     Home: HomeScreen,
     Details: DetailsScreen,
     Chat: ChatScreen,
-    ConvoList: ChatsScreen
+    //ConvoList: ChatsScreen
   },
   {
     initialRouteName: 'Home',
   }
 );
 
-const AuthStack = createStackNavigator({ SignIn: SignInScreen });
+const AuthStack = createStackNavigator(
+  {
+    SignIn: SignInScreen,
+    SignUp: DetailsScreen
+  });
 
 const AppContainer = createAppContainer(createSwitchNavigator(
   {
