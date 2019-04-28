@@ -16,19 +16,136 @@ import {
 import SocketIOClient from 'socket.io-client'
 
 import renderImages from '../assets/mock/mockImage';
+import { GiftedChat } from 'react-native-gifted-chat'
 
 // instead of this, write to a databse and to achive message reordering, just delete the
 // element from a username when it sends a new message and send the new messge
 // to the top every time kinda like shufflling cards, this would also sort as messages are received
 // instead of by timestamp making it harder to manipulate chats list order like people do in kik
-import { images, data } from '../assets/mock/mockChatList';
+import { images } from '../assets/mock/mockChatList';
+
+var mock = [{
+  "id": 2,
+  "first_name": "Amanda",
+  "last_name": "Grant",
+  "username": "lmfaogrant",
+  "time": "2:54 AM",
+  "message": "rutrum",
+  "isRead": false,
+  "isViewed": false,
+  "image": images[0]
+}, {
+  "id": 1,
+  "first_name": "Gloria",
+  "last_name": "Hicks",
+  "username": "hicksrgay",
+  "time": "11:56 AM",
+  "message": "viverra pede",
+  "isRead": false,
+  "isViewed": true,
+  "image": images[1]
+}, {
+  "id": 3,
+  "first_name": "Gloria",
+  "last_name": "Lane",
+  "username": "stayinyourlane",
+  "time": "1:34 AM",
+  "message": "vehicula consequat",
+  "isRead": true,
+  "isViewed": false,
+  "image": images[2]
+}]
+
+var convos = async function () {
+  try {
+    var e = await AsyncStorage.getItem("convoList");
+    console.log(e)
+    if (e) {
+      global.convoList = e;
+      return e
+    }else{
+      return [{
+        "id": 2,
+        "first_name": "Amanda",
+        "last_name": "Grant",
+        "username": "lmfaogrant",
+        "time": "2:54 AM",
+        "message": "rutrum",
+        "isRead": false,
+        "isViewed": false,
+        "image": images[0]
+      }, {
+        "id": 1,
+        "first_name": "Gloria",
+        "last_name": "Hicks",
+        "username": "hicksrgay",
+        "time": "11:56 AM",
+        "message": "viverra pede",
+        "isRead": false,
+        "isViewed": true,
+        "image": images[1]
+      }, {
+        "id": 3,
+        "first_name": "Gloria",
+        "last_name": "Lane",
+        "username": "stayinyourlane",
+        "time": "1:34 AM",
+        "message": "vehicula consequat",
+        "isRead": true,
+        "isViewed": false,
+        "image": images[2]
+      }]
+    }
+
+
+   } catch (error) {
+    return [{
+      "id": 2,
+      "first_name": "Amanda",
+      "last_name": "Grant",
+      "username": "lmfaogrant",
+      "time": "2:54 AM",
+      "message": "rutrum",
+      "isRead": false,
+      "isViewed": false,
+      "image": images[0]
+    }, {
+      "id": 1,
+      "first_name": "Gloria",
+      "last_name": "Hicks",
+      "username": "hicksrgay",
+      "time": "11:56 AM",
+      "message": "viverra pede",
+      "isRead": false,
+      "isViewed": true,
+      "image": images[1]
+    }, {
+      "id": 3,
+      "first_name": "Gloria",
+      "last_name": "Lane",
+      "username": "stayinyourlane",
+      "time": "1:34 AM",
+      "message": "vehicula consequat",
+      "isRead": true,
+      "isViewed": false,
+      "image": images[2]
+    }]
+    console.log(error)
+   }
+}
+
 
 // const images = R.range(1, 11).map(i => require(`../images/image${i}.jpeg`))
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
 class HomeScreen extends React.Component {
-  componentDidMount() {
 
+  componentWillMount(){
+
+
+  }
+
+  componentDidMount() {
       function SockIO(){
         this.socket = SocketIOClient('https://torch-messenger.herokuapp.com/', { transports: ['websocket'], jsonp: false });
 
@@ -75,17 +192,92 @@ class HomeScreen extends React.Component {
       });
 
       sio.socket.on('echo', (data) => {
-        console.log("echo: ", data);
-        
+        console.log("echo: ", data)
+        console.log(global.currentConvo)
+
         //socket.emit('ping');
       });
 
       sio.socket.on('authenticated', () => {
         console.log('authenticated')
       })
+
+      sio.socket.on('private_message', (data) => {
+
+        //console.log(this.state.convoList)
+
+        convoList.forEach( (item, index) => {
+          if (item.username == data.username){
+            let newEntry = {
+              "id": 9,
+              "first_name": item.first_name,
+              "last_name": item.last_name,
+              "username": item.username,
+              "time": "2:54 AM",
+              "message": data.body,
+              "isRead": false,
+              "isViewed": false,
+              "image": images[0]
+            }
+            this.state.convoList.splice(index, 1);
+            this.state.convoList.unshift(newEntry);
+            console.log(this.state.convoList)
+            // data = global.convoList
+            this.state.dataSource = ds.cloneWithRows(this.state.convoList)
+            AsyncStorage.setItem("convoList", JSON.stringify(this.state.convoList.slice(0,200)));
+          }
+        })
+
+
+
+        if (data.from == global.currentConvo) {
+          // update convo list and nothing else lmao
+        } else {
+          let lmao = {
+            _id: Math.round(Math.random() * 1000000),
+            text: data.body,
+            createdAt: new Date(),
+            user: {
+              _id: data.from,
+              name: data.from,
+              avatar: 'http://placeimg.com/140/140/people',
+            },
+          }
+
+
+          try {
+            const msgs = AsyncStorage.getItem(data.username + "_convo");
+            msgs.then((e)=>{
+
+              console.log(e)
+              if (e) {
+                let lol = GiftedChat.append(e, lmao)
+                AsyncStorage.setItem(global.currentConvo + "_convo", JSON.stringify(lol.slice(0,200)));
+
+                console.log("Saved: ", JSON.stringify(lol))
+
+                global.messages = e;
+              }else{
+                console.log("null lmao")
+                this.setState({
+                  name: name,
+                  messages: []
+                })
+              }
+            })
+
+          } catch (error) {
+            // Error saving data
+            console.log(error)
+          }
+        }
+
+      });
+
       sio.socket.on('ping', () => {
         console.log('ping');
-        //console.log(this.props)
+        global.stuff = Math.round(Math.random() * 1000000);
+        console.log(global.currentConvo)
         //socket.emit('ping');
       });
       sio.socket.on('no u', () => {
@@ -106,8 +298,13 @@ class HomeScreen extends React.Component {
   constructor(props){
     super(props)
 
+    let m = convos()
+    while(m == null){
+
+    }
+    console.log(m)
     this.state = {
-      dataSource: ds.cloneWithRows(data),
+      dataSource: ds.cloneWithRows(mock),
     }
   }
 
@@ -117,7 +314,7 @@ class HomeScreen extends React.Component {
     if (num > 1) {
      return (
       // <TouchableOpacity onPress ={() => {this.props.navigator.push({id:'chat', image:x.image, name:x.first_name}) }}>
-      <TouchableOpacity onPress ={() => {this.props.navigation.navigate('Chat', { name: x.first_name }); }}>
+      <TouchableOpacity onPress ={() => {this.props.navigation.navigate('Chat', { name: x.username }); }}>
         <View style={{ alignItems:'center', padding:10, flexDirection:'row', borderBottomWidth:1, borderColor:'#f7f7f7' }}>
           {
             renderImages(x.image)
@@ -128,7 +325,7 @@ class HomeScreen extends React.Component {
               <Text style={{ color:'#333', fontSize:10 }}>{x.time}</Text>
             </View>
             <View style={{ flexDirection:'row', alignItems:'center' }}>
-              <Text style={{ fontWeight:'400', color:'#333', marginLeft:15 }}>ur gay</Text>
+              <Text style={{ fontWeight:'400', color:'#333', marginLeft:15 }}>{x.message}</Text>
             </View>
           </View>
         </View>
@@ -138,7 +335,7 @@ class HomeScreen extends React.Component {
 
     return (
       //<TouchableOpacity>
-      <TouchableOpacity onPress ={() => {this.props.navigation.navigate('Chat'); }}>
+      <TouchableOpacity onPress ={() => {this.props.navigation.navigate('Chat', { name: x.username }); }}>
         <View style={{ alignItems:'center', padding:10, flexDirection:'row', borderBottomWidth:1, borderColor:'#f7f7f7' }}>
           {
             renderImages(x.image)

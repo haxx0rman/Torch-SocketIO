@@ -12,6 +12,8 @@ import ChatScreen from "./screens/IMUI";
 
 //import ChatsScreen from "./screens/chats";
 
+global.currentConvo;
+
 
 const AppStack = createStackNavigator(
   {
