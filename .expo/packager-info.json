@@ -1,9 +1,9 @@
 {
   "devToolsPort": 19002,
   "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 27416,
+  "packagerPort": null,
+  "packagerPid": null,
   "expoServerNgrokUrl": "https://8i-nty.anonymous.torch.exp.direct",
   "packagerNgrokUrl": "https://packager.8i-nty.anonymous.torch.exp.direct",
-  "ngrokPid": 27487
+  "ngrokPid": 4058
 }
